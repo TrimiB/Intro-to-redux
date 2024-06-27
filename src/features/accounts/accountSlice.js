@@ -37,10 +37,36 @@ export default function AccountReducer(state = initialStateAccount, action) {
   }
 }
 
-export function deposit(amount) {
-  return {
-    type: 'account/deposit',
-    payload: amount,
+export function deposit(amount, currency) {
+  if (currency === 'USD')
+    return {
+      type: 'account/deposit',
+      payload: amount,
+    };
+
+  // Middleware
+  return async function (dispatch, getState) {
+    // Frankfurter API Call
+    try {
+      const response = await fetch(
+        `https://api.frankfurter.app/latest?amount=${amount}&from=${currency}&to=USD`
+      );
+      console.log(response);
+
+      if (response.status !== 200)
+        throw new Error('Something went wrong while fetching data from the deposit function');
+
+      const data = await response.json();
+      const convertedRate = data.rates.USD;
+
+      // return action
+      dispatch({
+        type: 'account/deposit',
+        payload: convertedRate,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 }
 
