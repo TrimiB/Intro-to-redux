@@ -11,10 +11,10 @@ export default function AccountReducer(state = initialStateAccount, action) {
         ...state,
         balance: state.balance + action.payload,
       };
-    case 'accoount/withdraw':
+    case 'account/withdraw':
       return {
         ...state,
-        loan: state.balance - action.payload,
+        balance: state.balance - action.payload,
       };
     case 'account/requestLoan':
       if (state.loan > 0) return state;
