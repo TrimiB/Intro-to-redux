@@ -2,6 +2,7 @@ const initialStateAccount = {
   balance: 0,
   loan: 0,
   loanPurpose: '',
+  isLoading: false,
 };
 
 export default function AccountReducer(state = initialStateAccount, action) {
@@ -10,6 +11,7 @@ export default function AccountReducer(state = initialStateAccount, action) {
       return {
         ...state,
         balance: state.balance + action.payload,
+        isLoading: false,
       };
     case 'account/withdraw':
       return {
@@ -32,6 +34,8 @@ export default function AccountReducer(state = initialStateAccount, action) {
         loanPurpose: '',
         balance: state.balance - state.loan,
       };
+    case 'account/convertingCurrency':
+      return { ...state, isLoading: true };
     default:
       return state;
   }
@@ -48,6 +52,8 @@ export function deposit(amount, currency) {
   return async function (dispatch, getState) {
     // Frankfurter API Call
     try {
+      dispatch({ type: 'account/convertingCurrency' });
+
       const response = await fetch(
         `https://api.frankfurter.app/latest?amount=${amount}&from=${currency}&to=USD`
       );
